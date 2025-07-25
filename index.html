@@ -1,0 +1,37 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>EC2 Instance Metadata</title>
+    </head>
+    <body>
+        <h1>EC2 Instance Details</h1>
+        <p>Instance ID: <span id="instance-id">Loading...</span></p>
+        <p>Instance Type: <span id="instance-type">Loading...</span></p>
+        <p>Availability Zone: <span id="availability-zone">Loading...</span></p>
+        <p>Public IP: <span id="public-ip">Loading...</span></p>
+        <!-- Add more metadata fields as needed -->
+    </body>
+    <script>
+        async function fetchMetadata(path) {
+            try {
+                const response = await fetch(`http://169.254.169.254/latest/meta-data/${path}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.text();
+            } catch (error) {
+                console.error(`Error fetching metadata for ${path}:`, error);
+                return 'N/A';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('instance-id').innerText = await fetchMetadata('instance-id');
+            document.getElementById('instance-type').innerText = await fetchMetadata('instance-type');
+            const az = await fetchMetadata('placement/availability-zone');
+            document.getElementById('availability-zone').innerText = az;
+            document.getElementById('public-ip').innerText = await fetchMetadata('public-ipv4');
+        });
+    </script>
+    </html>
